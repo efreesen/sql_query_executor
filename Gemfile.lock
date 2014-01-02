@@ -16,6 +16,7 @@ GEM
     docile (1.1.1)
     mime-types (2.0)
     multi_json (1.8.2)
+    rake (10.1.1)
     rest-client (1.6.7)
       mime-types (>= 1.16)
     rspec (2.14.1)
@@ -41,5 +42,6 @@ PLATFORMS
 
 DEPENDENCIES
   coveralls
+  rake (>= 10.0.0)
   rspec (>= 2.2.0)
   sql_query_executor!
