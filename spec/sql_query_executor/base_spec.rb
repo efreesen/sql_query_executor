@@ -10,7 +10,7 @@ describe SqlQueryExecutor, "Base" do
     @data << {:id => 2, :name => "Canada", :language => 'English', :monarch => "The Crown of England"}
     @data << {:id => 3, :name => "Mexico", :language => 'Spanish'}
     @data << {:id => 4, :name => "UK",     :language => 'English', :monarch => "The Crown of England"}
-    @data << {:id => 5, :name => "Brazil", :founded_at => Time.parse('1500-04-22 13:34:25 -03:00')}
+    @data << {:id => 5, :name => "Brazil", :founded_at => Time.strptime('1500-04-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z")}
   end
 
   subject { SqlQueryExecutor::Base.new(@data) }
@@ -49,14 +49,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at = ?", Time.parse('1500-04-22 13:34:25 -03:00'))
+          record = subject.where("founded_at = ?", Time.strptime('1500-04-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("id = ?", Time.parse('1500-09-07 13:34:25 -03:00'))
+          record = subject.where("id = ?", Time.strptime('1500-09-07 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
@@ -106,14 +106,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at > ?", Time.parse('1500-04-20 13:34:25 -03:00'))
+          record = subject.where("founded_at > ?", Time.strptime('1500-04-20 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("founded_at > ?", Time.parse('1500-04-23 13:34:25 -03:00'))
+          record = subject.where("founded_at > ?", Time.strptime('1500-04-23 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
@@ -163,14 +163,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at >= ?", Time.parse('1500-04-22 13:34:25 -03:00'))
+          record = subject.where("founded_at >= ?", Time.strptime('1500-04-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("founded_at >= ?", Time.parse('1500-04-23 13:34:25 -03:00'))
+          record = subject.where("founded_at >= ?", Time.strptime('1500-04-23 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
@@ -220,14 +220,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at < ?", Time.parse('1500-04-22 13:34:26 -03:00'))
+          record = subject.where("founded_at < ?", Time.strptime('1500-04-22 13:34:26 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("founded_at < ?", Time.parse('1500-04-22 13:34:25 -03:00'))
+          record = subject.where("founded_at < ?", Time.strptime('1500-04-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
@@ -277,14 +277,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at <= ?", Time.parse('1500-04-22 13:34:25 -03:00'))
+          record = subject.where("founded_at <= ?", Time.strptime('1500-04-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("founded_at <= ?", Time.parse('1500-04-22 13:34:24 -03:00'))
+          record = subject.where("founded_at <= ?", Time.strptime('1500-04-22 13:34:24 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
@@ -334,14 +334,14 @@ describe SqlQueryExecutor, "Base" do
 
       context "when attribute is datetime" do
         it "matches a record" do
-          record = subject.where("founded_at between ? and ?", Time.parse('1500-04-22 13:34:24 -03:00'), Time.parse('1500-04-22 13:34:26 -03:00'))
+          record = subject.where("founded_at between ? and ?", Time.strptime('1500-04-22 13:34:24 -03:00', "%Y-%m-%d %H:%M:%S %z"), Time.strptime('1500-04-22 13:34:26 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 1
           record.first.id.should == 5
           record.first.name.should == 'Brazil'
         end
 
         it "doesn't match any record" do
-          record = subject.where("founded_at between ? and ?", Time.parse('1500-04-22 13:34:26 -03:00'), Time.parse('1500-09-22 13:34:25 -03:00'))
+          record = subject.where("founded_at between ? and ?", Time.strptime('1500-04-22 13:34:26 -03:00', "%Y-%m-%d %H:%M:%S %z"), Time.strptime('1500-09-22 13:34:25 -03:00', "%Y-%m-%d %H:%M:%S %z"))
           record.count.should == 0
           record.should == []
         end
