@@ -35,7 +35,7 @@ module SqlQueryExecutor
         elsif array.size == 3
           return array.first.to_i > 1000 ? Date.new(array[0].to_i, array[1].to_i, array[2].to_i) : value
         elsif array.size == 7
-          array[6] = array[6].gsub('00', ':00')
+          array[6] = array[6] == '+0000' ? '+00:00' : array[6].gsub('00', ':00')
           return array.first.to_i > 1000 ? Time.new(*array) : value
         end
 
