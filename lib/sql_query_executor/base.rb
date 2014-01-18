@@ -7,9 +7,10 @@ module SqlQueryExecutor #:nodoc:
     def initialize(collection=[])
       @collection = []
 
-      collection.each do |object|
-        register = OpenStruct.new(object)
-        @collection << register
+      if collection.any? && collection.first.is_a?(Hash)
+        convert_collection(collection)
+      else
+        @collection = conforming_collection?(collection) ? collection : []
       end
     end
 
@@ -18,6 +19,19 @@ module SqlQueryExecutor #:nodoc:
     def where(*query)
       query = SqlQueryExecutor::Query::Base.new(query, @collection)
       query.execute!
+    end
+
+  private
+    def convert_collection(collection)
+      collection.each do |object|
+        attributes = object.is_a?(Hash) ? object : object.attributes
+        register = OpenStruct.new(attributes)
+        @collection << register
+      end
+    end
+
+    def conforming_collection?(collection)
+      collection.first.respond_to?(:attributes)
     end
   end
 end
