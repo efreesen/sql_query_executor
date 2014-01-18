@@ -17,3 +17,8 @@ tmp
 .yardoc
 _yardoc
 doc/
+
+# Vagrant
+.vagrant/
+Vagrantfile
+puppet/
