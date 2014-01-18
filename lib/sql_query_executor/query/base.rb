@@ -3,8 +3,15 @@ require 'sql_query_executor/query/executor'
 module SqlQueryExecutor
   module Query
     class Base
+      attr_reader :query
+
+      CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
+
       def initialize(query, collection)
-        @query      = interpolate_query(query)
+        query = clean_query_attribute(query)
+        array = CONVERT_METHODS[query.class.name]
+
+        @query      = send(array.first, query)
         @collection = collection
         sanitize
       end
@@ -14,9 +21,22 @@ module SqlQueryExecutor
       end
 
     private
+      def clean_query_attribute(query)
+        return query unless query.is_a?(Array)
+
+        query = query.flatten
+
+        query.size == 1 ? query.first : query
+      end
+
+      def get_query(query)
+        query
+      end
+
       # Prepares query by replacing all ? by it's real values in #args
       def interpolate_query(args)
-        return args.first if args.size == 1
+        args.flatten!
+        return args.first if args.size == 1 && args.first.is_a?(String)
 
         query = args.first
         param = args.delete_at(1)
@@ -65,6 +85,21 @@ module SqlQueryExecutor
         else
           param = param.to_s
         end
+      end
+
+      def concatenate_hash(query)
+        return "" unless query.is_a?(Hash)
+        query_array = []
+
+        query.each do |key, value|
+          if value.is_a?(Array)
+            query_array << "#{key} in (#{value.join(',')})"
+          else
+            query_array << "#{key} = #{value}"
+          end
+        end
+
+        query_array.join(" and ")
       end
     end
   end
