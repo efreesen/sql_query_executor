@@ -1,23 +1,23 @@
-require 'sql_query_executor/query/executor'
-
 module SqlQueryExecutor
   module Query
     class Base
       attr_reader :query
 
       CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
+      STRING_SPACE = "$SS$"
+      QUERY_SPACE  = "$QS$"
+      TEMP_SPACE  = "$TS$"
 
       def initialize(query, collection)
         query = clean_query_attribute(query)
         array = CONVERT_METHODS[query.class.name]
 
-        @query      = send(array.first, query)
-        @collection = collection
-        sanitize
+        query = sanitize(send(array.first, query))
+        @query = SqlQueryExecutor::Query::SubQuery.new query, collection
       end
 
       def execute!
-        SqlQueryExecutor::Query::Executor.execute!(@query, @collection)
+        @query.execute!
       end
 
     private
@@ -43,34 +43,45 @@ module SqlQueryExecutor
 
         param = convert_param(param)
 
-        args[0] = query.sub("?", param)
+        args[0] = query.sub("?", param.is_a?(Numeric) ? param : "#{param}")
 
         interpolate_query(args)
       end
 
       # Removes all accents and other non default characters
-      def sanitize
+      def sanitize(query)
         cruft = /\'|\"|\(|\)/
 
-        new_query = @query ? @query.dup : @query
-        params = new_query.scan(/(["|'].*?["|'])|(\(.*?\))/).flatten.compact
+        new_query = query ? query.dup : query
+        params = new_query.scan(/(["|'].*?["|'])/).flatten.compact
 
         params.each do |param|
           new_param = param.dup
 
-          new_param = new_param.gsub(cruft,"")
-          new_param = new_param.gsub(" ", "$S$")
+          new_param = new_param.gsub(" ", STRING_SPACE)
 
           new_query = new_query.gsub(param, new_param)
         end
 
-        @query = new_query
+        
+        params = new_query.scan(/(\(.*?\))/).flatten.compact
 
-        remove_spaces
+        params.each do |param|
+          new_param = param.dup
+
+          new_param = new_param.gsub(" ", QUERY_SPACE)
+
+          new_query = new_query.gsub(param, new_param)
+        end
+
+        query = new_query.gsub(" and ", "#{TEMP_SPACE}and#{QUERY_SPACE}").gsub(" or ", "#{TEMP_SPACE}or#{QUERY_SPACE}").gsub(" ", QUERY_SPACE).gsub(TEMP_SPACE, " ")
+
+        remove_spaces(query)
       end
 
-      def remove_spaces
-        @query.gsub!(/\[.*?\]/) { |substr| substr.gsub(' ', '') }
+      def remove_spaces(query)
+        query.gsub!(/\[.*?\]/) { |substr| substr.gsub(' ', '') }
+        query
       end
 
       # Returns converted #param based on its Class, so it can be used on the query
@@ -93,8 +104,10 @@ module SqlQueryExecutor
 
         query.each do |key, value|
           if value.is_a?(Array)
+            value = value.first.is_a?(Numeric) ? value : value.map{ |v| "'#{v}'" }
             query_array << "#{key} in (#{value.join(',')})"
           else
+            value = value.is_a?(Numeric) ? value : "'#{value}'"
             query_array << "#{key} = #{value}"
           end
         end

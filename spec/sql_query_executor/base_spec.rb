@@ -6,11 +6,11 @@ describe SqlQueryExecutor, "Base" do
   before do
     @data = []
 
-    @data << {:id => 1, :name => "US",     :language => 'English'}
-    @data << {:id => 2, :name => "Canada", :language => 'English', :monarch => "The Crown of England"}
-    @data << {:id => 3, :name => "Mexico", :language => 'Spanish'}
-    @data << {:id => 4, :name => "UK",     :language => 'English', :monarch => "The Crown of England"}
-    @data << {:id => 5, :name => "Brazil", :founded_at => Time.parse('1500-04-22 13:34:25')}
+    @data << {id: 1, name: "US",     language: 'English'}
+    @data << {id: 2, name: "Canada", language: 'English', monarch: "The Crown of England"}
+    @data << {id: 3, name: "Mexico", language: 'Spanish'}
+    @data << {id: 4, name: "UK",     language: 'English', monarch: "The Crown of England"}
+    @data << {id: 5, name: "Brazil", founded_at: Time.parse('1500-04-22 13:34:25')}
   end
 
   subject { SqlQueryExecutor::Base.new(@data) }
@@ -413,6 +413,32 @@ describe SqlQueryExecutor, "Base" do
 
         records.should == [@data[0], @data[1], @data[2], @data[3]]
       end
+
+      context "nested queries" do
+        it "respects priority" do
+          records = subject.where("(language = 'English' and name = 'US') or (language is null)")
+          records.count.should == 2
+          records.first.id.should == 1
+
+          records.map! do |record|
+            record.to_h
+          end
+
+          records.should == [@data[0], @data[4]]
+        end
+
+        it "respects priority" do
+          records = subject.where("(language is null) or (language = 'English' and name = 'US')")
+          records.count.should == 2
+          records.first.id.should == 1
+
+          records.map! do |record|
+            record.to_h
+          end
+
+          records.should == [@data[0], @data[4]]
+        end
+      end
     end
 
     describe "in" do
@@ -426,6 +452,18 @@ describe SqlQueryExecutor, "Base" do
         end
 
         records.should == [@data[0], @data[1], @data[2], @data[3]]
+      end
+
+      xit "attribute not in condition" do
+        records = subject.where("language not in ('English', 'Spanish')")
+        records.count.should == 1
+        records.first.id.should == 5
+
+        records.map! do |record|
+          record.to_h
+        end
+
+        records.should == [@data[4]]
       end
     end
 
