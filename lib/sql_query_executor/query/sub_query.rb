@@ -1,3 +1,5 @@
+require 'sql_query_executor/query/sentence'
+
 module SqlQueryExecutor
   module Query
     class SubQuery
