@@ -16,6 +16,14 @@ describe SqlQueryExecutor, "Base" do
   subject { SqlQueryExecutor::Base.new(@data) }
 
   describe ".where" do
+    context "when invalid query is passed" do
+      it "raises an ArgumentError" do
+        query = [{name: "John"}]
+
+        expect { subject.where(query) }.to raise_error(ArgumentError, "First element from array must be a String. eg: [\"name = ?\", \"John\"]")
+      end
+    end
+
     describe "=" do
       context "when attribute is string" do
         it "matches a record" do
