@@ -3,7 +3,7 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class Between < SqlQueryExecutor::Operators::Base
-      def execute!
+      def execute!(result)
         @collection.select do |record|
           value = convert_value(record.send(@field).to_s)
 
@@ -22,8 +22,8 @@ module SqlQueryExecutor
       def get_value
         value = []
 
-        value << convert_value(@array[2].gsub('$S$', ' '))
-        value << convert_value(@array[4].gsub('$S$', ' '))
+        value << convert_value(@array[2].gsub(SqlQueryExecutor::Query::Base::STRING_SPACE, ' '))
+        value << convert_value(@array[4].gsub(SqlQueryExecutor::Query::Base::STRING_SPACE, ' '))
       end
     end
   end

@@ -8,7 +8,7 @@ module SqlQueryExecutor
         convert_operator
       end
 
-      def execute!
+      def execute!(result)
         @collection.select do |record|
           value = record.send(@field.to_s)
 
