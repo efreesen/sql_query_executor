@@ -4,9 +4,9 @@ module SqlQueryExecutor
       attr_reader :query
 
       CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
-      STRING_SPACE = "$SS$"
-      QUERY_SPACE  = "$QS$"
-      TEMP_SPACE  = "$TS$"
+      STRING_SPACE    = "$SS$"
+      QUERY_SPACE     = "$QS$"
+      TEMP_SPACE      = "$TS$"
 
       def initialize(query, collection)
         query = clean_query_attribute(query)
@@ -50,33 +50,34 @@ module SqlQueryExecutor
 
       # Removes all accents and other non default characters
       def sanitize(query)
-        cruft = /\'|\"|\(|\)/
+        new_query = replace_on_query(query, /(["|'].*?["|'])/, " ", STRING_SPACE)
+        new_query = replace_on_query(new_query, /(\(.*?\))/, " ", QUERY_SPACE)
 
+        remove_spaces(prepare_query(new_query))
+      end
+
+      def replace_on_query(query, regexp, pattern, replacement)
         new_query = query ? query.dup : query
-        params = new_query.scan(/(["|'].*?["|'])/).flatten.compact
+
+        params = new_query.scan(regexp).flatten.compact
 
         params.each do |param|
           new_param = param.dup
 
-          new_param = new_param.gsub(" ", STRING_SPACE)
+          new_param = new_param.gsub(pattern, replacement)
 
           new_query = new_query.gsub(param, new_param)
         end
 
-        
-        params = new_query.scan(/(\(.*?\))/).flatten.compact
+        new_query
+      end
 
-        params.each do |param|
-          new_param = param.dup
-
-          new_param = new_param.gsub(" ", QUERY_SPACE)
-
-          new_query = new_query.gsub(param, new_param)
+      def prepare_query(query)
+        SubQuery::BINDING_OPERATORS.keys.each do |operator|
+          query.gsub!(" #{operator} ", "#{TEMP_SPACE}#{operator}#{QUERY_SPACE}")
         end
 
-        query = new_query.gsub(" and ", "#{TEMP_SPACE}and#{QUERY_SPACE}").gsub(" or ", "#{TEMP_SPACE}or#{QUERY_SPACE}").gsub(" ", QUERY_SPACE).gsub(TEMP_SPACE, " ")
-
-        remove_spaces(query)
+        query.gsub(" ", QUERY_SPACE).gsub(TEMP_SPACE, " ")
       end
 
       def remove_spaces(query)
