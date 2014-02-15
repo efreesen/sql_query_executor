@@ -6,7 +6,7 @@ require 'sql_query_executor/operators/in'
 module SqlQueryExecutor
   module Query
     class Sentence
-      attr_reader :query, :binding_operator, :operator
+      attr_reader :query, :operator
 
       OPERATORS = {
         "between" => SqlQueryExecutor::Operators::Between,
@@ -23,28 +23,18 @@ module SqlQueryExecutor
         "exists"  => SqlQueryExecutor::Operators::Default,#Exists
       }
 
-      BINDING_OPERATORS = {
-        "and" => "&",
-        "or"  => "+"
-      }
-
       def initialize(query, collection)
         @query    = query
         @collection = collection
         @array = query.split(' ')
 
-        set_binding_operator
         set_operator
       end
 
       def execute!(data)
         return [] unless @operator
 
-        result = @operator.execute!(data)
-
-        result = data.send(@binding_operator, result) if @binding_operator && (data && !data.empty?)
-
-        result
+        @operator.execute!(data)
       end
 
     private
@@ -52,12 +42,6 @@ module SqlQueryExecutor
         operator = OPERATORS[@query.split(' ')[1]]
 
         @operator = operator ? operator.new(@query, @collection) : nil
-      end
-
-      def set_binding_operator
-        @binding_operator = BINDING_OPERATORS[@array.first]
-
-        fix_query if @binding_operator
       end
 
       def fix_query

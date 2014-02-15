@@ -11,7 +11,6 @@ describe SqlQueryExecutor::Query::Sentence do
         subject { described_class.new(query, data) }
 
         its(:query) { should == query }
-        its(:binding_operator) { should be_nil }
         its(:operator) { should be_a SqlQueryExecutor::Operators::Default }
       end
 
@@ -34,24 +33,6 @@ describe SqlQueryExecutor::Query::Sentence do
         subject { described_class.new(query, data) }
 
         its(:operator) { should be_a SqlQueryExecutor::Operators::In }
-      end
-    end
-
-    context "when rest of a composite query" do
-      context "and has 'or' as binding operator" do
-        let(:query) { "or name = \"US\"" }
-
-        subject { described_class.new(query, data) }
-
-        its(:binding_operator) { should == "+" }
-      end
-
-      context "and has 'and' as binding operator" do
-        let(:query) { "and name = \"US\"" }
-
-        subject { described_class.new(query, data) }
-
-        its(:binding_operator) { should == "&" }
       end
     end
   end
