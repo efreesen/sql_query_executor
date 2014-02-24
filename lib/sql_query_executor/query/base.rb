@@ -1,18 +1,16 @@
+require 'sql_query_executor/query/query_normalizer'
+
 module SqlQueryExecutor
   module Query
     class Base
       attr_reader :query
 
-      CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
       STRING_SPACE    = "$SS$"
       QUERY_SPACE     = "$QS$"
       TEMP_SPACE      = "$TS$"
 
       def initialize(query, collection)
-        query = clean_query_attribute(query)
-        array = CONVERT_METHODS[query.class.name]
-
-        query = sanitize(send(array.first, query))
+        query = QueryNormalizer.execute(query)
         @query = SqlQueryExecutor::Query::SubQuery.new query, collection
       end
 
