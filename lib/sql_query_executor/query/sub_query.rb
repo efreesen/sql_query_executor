@@ -24,7 +24,7 @@ module SqlQueryExecutor
           result = child.execute!(result)
         end
 
-        result = data.send(@binding_operator, result) if @binding_operator && (data && !data.empty?)
+        result = (data || []).send(@binding_operator, result) if @binding_operator
 
         result.sort_by(&:id)
       end
