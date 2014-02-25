@@ -43,12 +43,6 @@ module SqlQueryExecutor
 
         @operator = operator ? operator.new(@query, @collection) : nil
       end
-
-      def fix_query
-        @array.delete_at(0) 
-
-        @query = @array.join(' ')
-      end
     end
   end
 end

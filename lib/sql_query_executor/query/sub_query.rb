@@ -77,31 +77,6 @@ module SqlQueryExecutor
         array.size <= 5
       end
 
-      def build_sub_query(query)
-        array = query.split(" ")
-
-        offset = is_binding_operator?(array.first) ? 1 : 0
-        operator = array[1+offset]
-
-        result = case operator
-        when "between"
-          array[0..4+offset]
-        when "is"
-          size = array[2+offset] == "not" ? 3 : 2
-          array[0..size+offset]
-        when "not"
-          array[0..3+offset]
-        else
-          array[0..2+offset]
-        end
-
-        result.join(' ')
-      end
-
-      def is_binding_operator?(operator)
-        BINDING_OPERATORS.include?(operator)
-      end
-
       def replace_parentheses(query)
         count = 1
         string = ""
