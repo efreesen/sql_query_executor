@@ -15,6 +15,42 @@ describe SqlQueryExecutor, "Base" do
 
   subject { SqlQueryExecutor::Base.new(@data) }
 
+  describe "initialize" do
+    before do
+      class Model
+        attr_reader :attributes
+
+        def initialize(attributes)
+          @attributes = attributes
+        end
+
+        def id
+          @attributes[:id]
+        end
+      end
+
+      class Collection
+        def initialize(collection)
+          @collection = []
+
+          collection.each do |hash|
+            @collection << Model.new(hash)
+          end
+        end
+
+        def all
+          @collection
+        end
+      end
+    end
+
+    subject { SqlQueryExecutor::Base.new(Collection.new(@data).all) }
+
+    it 'initializes with a conforming collection' do
+      expect(subject.where(id: 1).first.attributes).to eq (@data.first)
+    end
+  end
+
   describe ".where" do
     context "when invalid query is passed" do
       it "raises an ArgumentError" do

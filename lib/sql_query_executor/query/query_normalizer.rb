@@ -127,10 +127,10 @@ module SqlQueryExecutor
               if value.is_a?(Hash)
                 operator = operators[value.keys.first] || operator
 
-                value = convert_param(value.values.first) if operators.include?(value.keys.first)
+                value = convert_param(value.values.first)
               end
 
-              value = value.is_a?(Numeric) ? value : "#{convert_param(value)}"
+              value = "#{convert_param(value)}"
               query_array << "#{key} #{operator} #{value}"
             end
           end

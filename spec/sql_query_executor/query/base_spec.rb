@@ -91,17 +91,30 @@ describe SqlQueryExecutor::Query::Base do
       end
 
       context 'value is an Array' do
-        let(:query) { { name: ["US", "Canada"] } }
+        context 'in operator' do
+          let(:query) { { name: ["US", "Canada"] } }
 
-        it 'creates an in condition in query' do
-          query_executor = SqlQueryExecutor::Query::Base.new(query, data)
+          it 'creates an in condition in query' do
+            query_executor = SqlQueryExecutor::Query::Base.new(query, data)
 
-          expect(query_executor.to_sql).to eq "name in ('US','Canada')"
+            expect(query_executor.to_sql).to eq "name in ('US','Canada')"
+          end
+
+          it 'creates an in condition in selector' do
+            query_executor = SqlQueryExecutor::Query::Base.new(query, data)
+            selector = {"name" => {"$in" => ['US','Canada']}}
+
+            expect(query_executor.selector).to eq selector
+          end
         end
+      end
 
-        it 'creates an in condition in selector' do
+      context 'between operator' do
+        let(:query) { 'id between 1 and 3' }
+        let(:selector) { { 'id' => {'$gte' => 1, '$lte' => 3} } }
+
+        it 'creates a gte and a lte condition in selector' do
           query_executor = SqlQueryExecutor::Query::Base.new(query, data)
-          selector = {"name" => {"$in" => ['US','Canada']}}
 
           expect(query_executor.selector).to eq selector
         end
