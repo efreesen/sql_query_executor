@@ -1,5 +1,4 @@
 require 'sql_query_executor'
-require 'pry'
 
 module SqlQueryExecutor
   module Query
@@ -124,7 +123,7 @@ module SqlQueryExecutor
               end
             else
               operator = '='
-              
+
               if value.is_a?(Hash)
                 operator = operators[value.keys.first] || operator
 

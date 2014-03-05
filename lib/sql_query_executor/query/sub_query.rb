@@ -1,5 +1,4 @@
 require 'sql_query_executor/query/sentence'
-require 'pry'
 
 module SqlQueryExecutor
   module Query

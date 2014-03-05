@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 require 'sql_query_executor'
-require 'pry'
 
 describe SqlQueryExecutor::Query::Base do
   let(:single_query) { "name = 'US'" }
