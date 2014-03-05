@@ -1,7 +1,7 @@
-# require 'coveralls'
-# Coveralls.wear!
-require 'simplecov'
-SimpleCov.start
+require 'coveralls'
+Coveralls.wear!
+# require 'simplecov'
+# SimpleCov.start
 
 require 'rspec'
 require 'rspec/autorun'
