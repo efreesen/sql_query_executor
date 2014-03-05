@@ -10,13 +10,17 @@ module SqlQueryExecutor
         @value      = get_value
       end
 
+      def selector
+        { @field => @value }
+      end
+
     protected
       def get_field
         @array.first
       end
 
       def get_value
-        value = @array.last.gsub(::SqlQueryExecutor::Query::Base::STRING_SPACE, ' ')
+        value = @array.last.gsub(SqlQueryExecutor::Query::Base::STRING_SPACE, ' ')
 
         convert_value(value)
       end

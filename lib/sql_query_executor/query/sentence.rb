@@ -37,6 +37,10 @@ module SqlQueryExecutor
         @operator.execute!(data)
       end
 
+      def selector
+        @operator.selector
+      end
+
     private
       def set_operator
         operator = OPERATORS[@query.split(' ')[1]]

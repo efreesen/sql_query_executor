@@ -18,7 +18,6 @@ module SqlQueryExecutor #:nodoc:
     # Recursive method that divides the query in sub queries, executes each part individually
     # and finally relates its results as specified in the query.
     def where(*query)
-      raise ArgumentError.new("must pass at least one argument") if query.empty?
       query = query.first if query.respond_to?(:size) && query.size == 1
 
       message = check_query(query)
@@ -42,6 +41,8 @@ module SqlQueryExecutor #:nodoc:
     end
 
     def check_query(query)
+      return "must pass at least one argument" if query.empty?
+
       if query.is_a?(Array) && !query.first.is_a?(String)
         "First element from array must be a String. eg: [\"name = ?\", \"John\"]"
       end

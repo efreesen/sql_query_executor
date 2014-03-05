@@ -1,8 +1,9 @@
 require 'sql_query_executor'
+require 'pry'
 
 module SqlQueryExecutor
   module Query
-    class SqlQueryExecutor::Query::QueryNormalizer
+    class QueryNormalizer
       class << self
         CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
 
@@ -92,7 +93,7 @@ module SqlQueryExecutor
         def convert_param(param)
           case param.class.name
           when "String"
-            param = "'#{param}'"
+            param = "'#{param}'".gsub("''", "'").gsub('""', '"')
           when "Date"
             param = "'#{param.strftime("%Y-%m-%d")}'"
           when "Time"
@@ -105,14 +106,33 @@ module SqlQueryExecutor
         def concatenate_hash(query)
           return "" unless query.is_a?(Hash)
           query_array = []
+          operators   = {"$gt" => '>', "$lt" => '<', "$gte" => '>=', "$lte" => '<=', "$ne" => '!=', "$in" => 'in'}
 
           query.each do |key, value|
             if value.is_a?(Array)
-              value = value.first.is_a?(Numeric) ? value : value.map{ |v| "'#{v}'" }
-              query_array << "#{key} in (#{value.join(',')})"
+              if [:and, :or].include?(key)
+                queries = []
+
+                value.each do |hash|
+                  queries << concatenate_hash(hash)
+                end
+
+                query_array << queries.join(" #{key.to_s} ")
+              else
+                value = value.first.is_a?(Numeric) ? value : value.map{ |v| "'#{v}'" }
+                query_array << "#{key} in (#{value.join(',')})"
+              end
             else
-              value = value.is_a?(Numeric) ? value : "'#{value}'"
-              query_array << "#{key} = #{value}"
+              operator = '='
+              
+              if value.is_a?(Hash)
+                operator = operators[value.keys.first] || operator
+
+                value = convert_param(value.values.first) if operators.include?(value.keys.first)
+              end
+
+              value = value.is_a?(Numeric) ? value : "#{convert_param(value)}"
+              query_array << "#{key} #{operator} #{value}"
             end
           end
 

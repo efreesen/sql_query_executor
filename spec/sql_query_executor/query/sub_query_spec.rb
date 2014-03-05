@@ -6,11 +6,12 @@ describe SqlQueryExecutor::Query::SubQuery do
 
   describe "initialize" do
     context "when has a sentence" do
-      let(:query) { "name$QS$=$QS$\"US\"" }
+      let!(:query) { "name$QS$=$QS$\"US\"" }
+      let!(:clean_query) { "name = \"US\"" }
       subject { described_class.new(query, data) }
 
       its(:kind) { should == :sentence }
-      its(:query) { should == query }
+      its(:to_sql) { should == clean_query }
 
       it "has one children" do
         expect(subject.children.size).to eq 1
@@ -23,10 +24,11 @@ describe SqlQueryExecutor::Query::SubQuery do
 
     context "when has a sub_query" do
       let(:query) { "(name$QS$=$QS$\"US\"$QS$and$QS$id$QS$=$QS$1) and$QS$language$QS$=$QS$\"English\"" }
+      let(:clean_query) { "(name = \"US\" and id = 1) and language = \"English\"" }
       subject { described_class.new(query, data) }
 
       its(:kind) { should == :sub_query }
-      its(:query) { should == query }
+      its(:to_sql) { should == clean_query }
 
       it "has 2 children" do
         expect(subject.children.size).to eq 2
@@ -40,10 +42,11 @@ describe SqlQueryExecutor::Query::SubQuery do
 
     context "when has a complex sub_query" do
       let(:query) { "((name$QS$=$QS$\"US\"$QS$and$QS$id$QS$=$QS$1)$QS$or$QS$(name$QS$=$QS$\"Brazil\")) and$QS$language$QS$=$QS$\"English\"" }
+      let(:clean_query) { "((name = \"US\" and id = 1) or (name = \"Brazil\")) and language = \"English\"" }
       subject { described_class.new(query, data) }
 
       its(:kind) { should == :sub_query }
-      its(:query) { should == query }
+      its(:to_sql) { should == clean_query }
 
       it "has 2 children" do
         expect(subject.children.size).to eq 2

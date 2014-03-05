@@ -18,6 +18,10 @@ module SqlQueryExecutor
         end
       end
 
+      def selector
+        { @field => { "$gte" => @value.first, "$lte" => @value.last }}
+      end
+
     private
       def get_value
         value = []

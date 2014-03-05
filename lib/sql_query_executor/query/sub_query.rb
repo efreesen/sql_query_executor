@@ -1,10 +1,11 @@
 require 'sql_query_executor/query/sentence'
+require 'pry'
 
 module SqlQueryExecutor
   module Query
     class SubQuery
       BINDING_OPERATORS = { "or" => "+", "and" => "&" }
-      attr_reader :query, :children, :kind
+      attr_reader :children, :kind, :binding_operator
       ADD_CHILDREN_METHODS = { sentence: :add_sentence_children, sub_query: :add_sub_query_children }
       def initialize(query, collection)
         @collection = collection
@@ -27,6 +28,25 @@ module SqlQueryExecutor
         result = (data || []).send(@binding_operator, result) if @binding_operator
 
         result.sort_by(&:id)
+      end
+
+      def selector
+        hash = {}
+
+        @children.each do |child|
+          if child.respond_to?(:binding_operator) && child.binding_operator
+            operator = BINDING_OPERATORS.invert[child.binding_operator]
+            hash = {operator.to_sym => [hash,child.selector]}
+          else
+            hash.merge!(child.selector)
+          end
+        end
+
+        hash
+      end
+
+      def to_sql
+        QueryNormalizer.clean_query(@query)
       end
 
     private

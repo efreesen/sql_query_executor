@@ -11,6 +11,10 @@ module SqlQueryExecutor
         end
       end
 
+      def selector
+        { @field => { "$in" => @value }}
+      end
+
     private
       def get_value
         value = super
