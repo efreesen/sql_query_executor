@@ -4,19 +4,17 @@ module SqlQueryExecutor
   module Query
     class QueryNormalizer
       class << self
-        CONVERT_METHODS = {"String" => ["get_query", ""], "Array" => ["interpolate_query", "query.flatten"], "Hash" => ["concatenate_hash", "query"]}
+        CONVERT_METHODS = {"String" => "get_query", "Array" => "interpolate_query", "Hash" => "concatenate_hash"}
 
         def execute(query)
           query = clean_query_attribute(query)
-          array = CONVERT_METHODS[query.class.name]
+          method = CONVERT_METHODS[query.class.name]
 
-          query = sanitize(send(array.first, query))
+          query = sanitize(send(method, query))
         end
 
         def clean_query(query)
-          query = execute(query)
-
-          remove_placeholders(query)
+          remove_placeholders execute(query)
         end
 
       private
@@ -84,6 +82,7 @@ module SqlQueryExecutor
         end
 
         def remove_spaces(query)
+          query.gsub!(",#{Base::QUERY_SPACE}", ',')
           query.gsub!(/\[.*?\]/) { |substr| substr.gsub(' ', '') }
           query
         end
@@ -91,14 +90,16 @@ module SqlQueryExecutor
         # Returns converted #param based on its Class, so it can be used on the query
         def convert_param(param)
           case param.class.name
+          when "NilClass"
+            nil
           when "String"
-            param = "'#{param}'".gsub("''", "'").gsub('""', '"')
+            "'#{param}'".gsub("''", "'").gsub('""', '"')
           when "Date"
-            param = "'#{param.strftime("%Y-%m-%d")}'"
+            "'#{param.strftime("%Y-%m-%d")}'"
           when "Time"
-            param = "'#{param.strftime("%Y-%m-%d %H:%M:%S %z")}'"
+            "'#{param.strftime("%Y-%m-%d %H:%M:%S %z")}'"
           else
-            param = param.to_s
+            param.to_s
           end
         end
 
@@ -109,14 +110,15 @@ module SqlQueryExecutor
 
           query.each do |key, value|
             if value.is_a?(Array)
-              if [:and, :or].include?(key)
+              if ['$and', '$or'].include?(key)
+                key = key.gsub('$', '')
                 queries = []
 
                 value.each do |hash|
                   queries << concatenate_hash(hash)
                 end
 
-                query_array << queries.join(" #{key.to_s} ")
+                query_array << "(#{queries.join(" #{key.to_s} ")})"
               else
                 value = value.first.is_a?(Numeric) ? value : value.map{ |v| "'#{v}'" }
                 query_array << "#{key} in (#{value.join(',')})"
@@ -130,10 +132,11 @@ module SqlQueryExecutor
                 value = convert_param(value.values.first)
               end
 
-              value = "#{convert_param(value)}"
-              query_array << "#{key} #{operator} #{value}"
+              value = convert_param(value)
+              query_array << (value.nil? ? "#{key} is null" : "#{key} #{operator} #{value}")
             end
           end
+
 
           query_array.join(" and ")
         end
