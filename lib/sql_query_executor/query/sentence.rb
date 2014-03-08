@@ -6,7 +6,7 @@ require 'sql_query_executor/operators/in'
 module SqlQueryExecutor
   module Query
     class Sentence
-      attr_reader :query, :operator
+      attr_reader :query
 
       OPERATORS = {
         "between" => SqlQueryExecutor::Operators::Between,
@@ -31,10 +31,11 @@ module SqlQueryExecutor
         set_operator
       end
 
-      def execute!(data)
+      # The data parameter is only declared for SubQuery compatibility purposes
+      def execute!(data=[])
         return [] unless @operator
 
-        @operator.execute!(data)
+        @operator.execute!
       end
 
       def selector

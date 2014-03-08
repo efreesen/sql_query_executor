@@ -17,7 +17,7 @@ module SqlQueryExecutor
         convert_operator
       end
 
-      def execute!(result)
+      def execute!
         @collection.select do |record|
           value = record.send(@field.to_s)
 
@@ -28,7 +28,7 @@ module SqlQueryExecutor
       def selector
         operator = SELECTORS[@operator]
 
-        { @field.to_sym => operator ? {operator => @value} : @value}
+        { @field => operator ? {operator => @value} : @value}
       end
 
     private

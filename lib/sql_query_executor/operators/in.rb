@@ -3,7 +3,7 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class In < SqlQueryExecutor::Operators::Base
-      def execute!(result)
+      def execute!
         result = @collection.select do |record|
           value = record.send(@field)
 
@@ -19,7 +19,7 @@ module SqlQueryExecutor
       def get_value
         value = super
 
-        value.gsub(SqlQueryExecutor::Query::Base::STRING_SPACE, '').split(',').map &:strip
+        value.gsub(SqlQueryExecutor::Base::STRING_SPACE, '').split(',').map{ |v| convert_value(v) }
       end
     end
   end

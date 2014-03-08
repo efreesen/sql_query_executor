@@ -1,10 +1,12 @@
+require 'sql_query_executor/base'
+
 module SqlQueryExecutor
   module Operators
     class Base
       def initialize(query, collection)
-        @query      = sanitize_query(query)
+        @query      = SqlQueryExecutor::Query::QueryNormalizer.execute(query).gsub(SqlQueryExecutor::Base::QUERY_SPACE, ' ')
         @collection = collection
-        @array      = query.split(' ')
+        @array      = @query.split(' ')
         @operator   = @query.split(' ')[1]
         @field      = get_field
         @value      = get_value
@@ -20,7 +22,7 @@ module SqlQueryExecutor
       end
 
       def get_value
-        value = @array.last.gsub(SqlQueryExecutor::Query::Base::STRING_SPACE, ' ')
+        value = @array.last.gsub(SqlQueryExecutor::Base::STRING_SPACE, ' ')
 
         convert_value(value)
       end
@@ -32,21 +34,13 @@ module SqlQueryExecutor
         methods = {3 => "convert_date", 7 => "convert_time"}
 
         array = split(value)
-  
+
         value = (send(methods[array.size], array) || value) if methods.keys.include?(array.size)
 
         value
       end
 
     private
-      def sanitize_query(query)
-        params = query.scan(/(\(.*?\))/).flatten.compact
-
-        params.each { |param| query.gsub!(param, param.gsub(" ", "")) }
-
-        query
-      end
-
       def is_a_number?(value)
         value.to_s == value.to_i.to_s
       end

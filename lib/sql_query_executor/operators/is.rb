@@ -8,17 +8,21 @@ module SqlQueryExecutor
         convert_operator
       end
 
-      def execute!(result)
+      def execute!
         @collection.select do |record|
           value = record.send(@field)
 
-          value.send(@operator, nil)
+          value.send(@operator, @value)
         end
+      end
+
+      def selector
+        @operator == '==' ? { @field => @value } : { @field => {'$ne' => @value} }
       end
 
     private
       def get_value
-        @array.include?('null') ? 'nil' : @array.last
+        @array.include?('null') ? nil : convert_value(@array.last)
       end
 
       def convert_operator
