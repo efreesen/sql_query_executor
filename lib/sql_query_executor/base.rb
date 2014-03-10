@@ -61,8 +61,6 @@ module SqlQueryExecutor #:nodoc:
     end
 
     def check_query(query)
-      return "must pass at least one argument" if query.empty?
-
       if query.is_a?(Array) && !query.first.is_a?(String)
         "First element from array must be a String. eg: [\"name = ?\", \"John\"]"
       end
