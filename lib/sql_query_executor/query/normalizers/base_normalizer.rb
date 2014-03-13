@@ -22,6 +22,8 @@ module SqlQueryExecutor
         end
 
         def self.attributes_from_query(selector)
+          return {} if selector.empty?
+
           attributes = {}
 
           selector.each do |key, value|

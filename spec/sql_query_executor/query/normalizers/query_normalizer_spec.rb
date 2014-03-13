@@ -142,7 +142,18 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
   end
 
   describe '.attributes_from_query' do
-    context 'single selector' do
+    context 'empty query' do
+      let(:query) { '' }
+      let(:selector) { {} }
+
+      subject { described_class.attributes_from_query(query) }
+
+      it 'converts correctly' do
+        expect(subject).to eq(selector)
+      end
+    end
+
+    context 'single query' do
       context 'when value is a string' do
         let(:query) { 'monarch = "Crown of england"' }
         let(:selector) { {monarch: "Crown of england"} }
@@ -210,7 +221,7 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
       end
     end
 
-    context 'multiple selectors' do
+    context 'multiple queries' do
       let(:query) { 'name = "US" and monarch = "Crown of england"' }
       let(:selector) { {name: 'US', monarch: "Crown of england"} }
 
@@ -221,7 +232,7 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
       end
     end
 
-    context 'nested selectors' do
+    context 'nested queries' do
       let(:selector) { {name: 'US', '$and' => [{id: 1}, {monarch: "Crown of england"}] } }
       let(:attributes) { {name: 'US', id: 1, monarch: "Crown of england"}  }
 
@@ -232,7 +243,7 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
       end
     end
 
-    context 'complex selectors' do
+    context 'complex queries' do
       let(:selector) { {name: 'US', '$and' => [{id: 1}, '$or' => [{name: 'Brazil'}, {monarch: "Crown of england"}]] } }
       let(:attributes) { {name: 'US', id: 1} }
 

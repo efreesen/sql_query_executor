@@ -20,6 +20,7 @@ module SqlQueryExecutor
         end
 
         def self.attributes_from_query(query)
+          return {} if query.empty?
           selector = query.class == Hash ? query : Base.new([], query).selector
           super(selector)
         end
