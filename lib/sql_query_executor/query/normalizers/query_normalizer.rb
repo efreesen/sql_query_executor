@@ -1,10 +1,11 @@
 require 'sql_query_executor'
 require 'sql_query_executor/query/normalizers/base_normalizer'
+require 'sql_query_executor/query/normalizers/origin_normalizer'
 
 module SqlQueryExecutor
   module Query
     class QueryNormalizer < BaseNormalizer
-      CONVERT_METHODS = {"String" => "get_query", "Array" => "interpolate_query", "Hash" => "concatenate_hash"}
+      CONVERT_METHODS = {"String" => "get_query", "Array" => "interpolate_query", "Hash" => "convert_hash"}
 
       def self.execute(query)
         query = clean_query_attribute(query)
@@ -14,10 +15,14 @@ module SqlQueryExecutor
       end
 
       def self.clean_query(query)
-        remove_placeholders execute(query)
+        remove_placeholders execute(query).gsub('!=', '<>')
       end
 
     private
+      def self.convert_hash(query)
+        OriginNormalizer.execute(query)
+      end
+
       def self.remove_placeholders(query)
         query.gsub(Base::QUERY_SPACE, ' ').gsub(Base::STRING_SPACE, ' ').gsub(Base::TEMP_SPACE, ' ')
       end
@@ -27,7 +32,7 @@ module SqlQueryExecutor
 
         query = query.flatten
 
-        (query.size == 1 ? query.first : query).gsub('!=', '<>')
+        (query.size == 1 ? query.first : query)
       end
 
       def self.get_query(query)

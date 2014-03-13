@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'sql_query_executor/query/query_normalizer'
+require 'sql_query_executor/query/normalizers/query_normalizer'
 
 describe SqlQueryExecutor::Query::QueryNormalizer do
   describe '.execute' do

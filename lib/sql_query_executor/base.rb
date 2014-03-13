@@ -1,5 +1,5 @@
 require 'ostruct'
-require 'sql_query_executor/query/query_normalizer'
+require 'sql_query_executor/query/normalizers/query_normalizer'
 require 'sql_query_executor/query/sub_query'
 
 # Simulates a SQL where clause to filter objects from the database
