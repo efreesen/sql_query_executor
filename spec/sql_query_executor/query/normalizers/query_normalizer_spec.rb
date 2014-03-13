@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'sql_query_executor/query/normalizers/query_normalizer'
 
-describe SqlQueryExecutor::Query::QueryNormalizer do
+describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
   describe '.execute' do
     context 'query is a String' do
       let(:query) { 'monarch = "Crown of england"' }
@@ -137,6 +137,109 @@ describe SqlQueryExecutor::Query::QueryNormalizer do
 
       it 'converts correctly' do
         expect(subject).to eq("(monarch = 'Crown of england' and name = 'Canada' and (monarch is null or name = 'Brazil'))")
+      end
+    end
+  end
+
+  describe '.attributes_from_query' do
+    context 'single selector' do
+      context 'when value is a string' do
+        let(:query) { 'monarch = "Crown of england"' }
+        let(:selector) { {monarch: "Crown of england"} }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject).to eq(selector)
+        end
+      end
+
+      context 'when value is an integer' do
+        let(:query) { 'id = 1' }
+        let(:selector) { {id: 1} }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject).to eq(selector)
+        end
+      end
+
+      context 'when value is a date' do
+        let(:today) { Date.today }
+        let(:query) { "created_at = '#{today.strftime('%Y-%m-%d')}'" }
+        let(:selector) { {created_at: today} }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject).to eq(selector)
+        end
+      end
+
+      context 'when value is a time' do
+        let(:now) { Time.now }
+        let(:query) { "created_at = '#{now.strftime('%Y-%m-%d %H:%M:%S %z')}'" }
+        let(:selector) { {created_at: now} }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject.to_s).to eq(selector.to_s)
+        end
+      end
+
+      context 'when value is an array' do
+        let(:query) { "name in ('Canada', 'Russia')" }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject).to eq({})
+        end
+      end
+
+      context 'when value is a hash' do
+        let(:query) { "name <> 'Canada'" }
+
+        subject { described_class.attributes_from_query(query) }
+
+        it 'converts correctly' do
+          expect(subject).to eq({})
+        end
+      end
+    end
+
+    context 'multiple selectors' do
+      let(:query) { 'name = "US" and monarch = "Crown of england"' }
+      let(:selector) { {name: 'US', monarch: "Crown of england"} }
+
+      subject { described_class.attributes_from_query(query) }
+
+      it 'converts correctly' do
+        expect(subject).to eq(selector)
+      end
+    end
+
+    context 'nested selectors' do
+      let(:selector) { {name: 'US', '$and' => [{id: 1}, {monarch: "Crown of england"}] } }
+      let(:attributes) { {name: 'US', id: 1, monarch: "Crown of england"}  }
+
+      subject { described_class.attributes_from_query(selector) }
+
+      it 'converts correctly' do
+        expect(subject).to eq(attributes)
+      end
+    end
+
+    context 'complex selectors' do
+      let(:selector) { {name: 'US', '$and' => [{id: 1}, '$or' => [{name: 'Brazil'}, {monarch: "Crown of england"}]] } }
+      let(:attributes) { {name: 'US', id: 1} }
+
+      subject { described_class.attributes_from_query(selector) }
+
+      it 'converts correctly' do
+        expect(subject).to eq(attributes)
       end
     end
   end

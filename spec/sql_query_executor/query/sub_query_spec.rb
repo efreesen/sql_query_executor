@@ -59,7 +59,7 @@ describe SqlQueryExecutor::Query::SubQuery do
 
       context 'selector' do
         it 'returns selector' do
-          expect(subject.selector).to eq({:and=>[{:and=>[{"name"=>"US"}, {"id"=>1}]}, {"language"=>"English"}]})
+          expect(subject.selector).to eq({'$and'=>[{'$and'=>[{"name"=>"US"}, {"id"=>1}]}, {"language"=>"English"}]})
         end
       end
 
@@ -90,7 +90,7 @@ describe SqlQueryExecutor::Query::SubQuery do
 
       context 'selector' do
         it 'returns selector' do
-          expect(subject.selector).to eq({:and=>[{:or=>[{:and=>[{"name"=>"US"}, {"id"=>1}]}, {"name"=>"Brazil"}]}, {"created_at"=>{'$gt' => Date.new(2014,01,04)}}]})
+          expect(subject.selector).to eq({'$and'=>[{'$or'=>[{'$and'=>[{"name"=>"US"}, {"id"=>1}]}, {"name"=>"Brazil"}]}, {"created_at"=>{'$gt' => Date.new(2014,01,04)}}]})
         end
       end
 

@@ -16,7 +16,7 @@ module SqlQueryExecutor #:nodoc:
       raise ArgumentError.new(message) if message
 
       get_collection(collection)
-      query = Query::QueryNormalizer.execute(query)
+      query = Query::Normalizers::QueryNormalizer.execute(query)
       @query = SqlQueryExecutor::Query::SubQuery.new query, @collection
     end
 

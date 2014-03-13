@@ -35,7 +35,7 @@ module SqlQueryExecutor
         @children.each do |child|
           if child.respond_to?(:binding_operator) && child.binding_operator
             operator = BINDING_OPERATORS.invert[child.binding_operator]
-            hash = {operator.to_sym => [hash,child.selector]}
+            hash = {"$#{operator}" => [hash,child.selector]}
           else
             hash.merge!(child.selector)
           end
@@ -45,7 +45,7 @@ module SqlQueryExecutor
       end
 
       def to_sql
-        QueryNormalizer.clean_query(@query)
+        SqlQueryExecutor::Query::Normalizers::QueryNormalizer.clean_query(@query)
       end
 
     private

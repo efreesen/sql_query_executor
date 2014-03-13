@@ -4,7 +4,7 @@ module SqlQueryExecutor
   module Operators
     class Base
       def initialize(query, collection)
-        @query      = SqlQueryExecutor::Query::QueryNormalizer.execute(query).gsub(SqlQueryExecutor::Base::QUERY_SPACE, ' ')
+        @query      = SqlQueryExecutor::Query::Normalizers::QueryNormalizer.execute(query).gsub(SqlQueryExecutor::Base::QUERY_SPACE, ' ')
         @collection = collection
         @array      = @query.split(' ')
         @operator   = @query.split(' ')[1]
