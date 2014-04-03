@@ -81,11 +81,18 @@ describe SqlQueryExecutor::Base do
     end
 
     context 'to_sql' do
-      let(:query)    { "name = 'Brazil'" }
-      let(:selector) { {name: 'Brazil'} }
-
       it 'converts selector' do
+        query = "name = 'Brazil'"
+        selector = {name: 'Brazil'}
+
         expect(described_class.new([], selector).to_sql).to eq query
+      end
+
+      it 'removes quotes from null' do
+        wrong_query = "id is not 'null'"
+        right_query = 'id is not null'
+
+        expect(described_class.new([], wrong_query).to_sql).to eq right_query
       end
     end
   end

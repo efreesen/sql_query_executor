@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'ruby-prof'
 require 'sql_query_executor/query/normalizers/query_normalizer'
 
 describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
@@ -83,12 +84,16 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
   describe 'clean_query' do
     context 'query is a String' do
-      let(:query) { 'monarch = "Crown of england"' }
-
-      subject { described_class.clean_query(query) }
-
       it 'adds separators' do
-        expect(subject).to eq 'monarch = "Crown of england"'
+        query = 'monarch = "Crown of england"'
+
+        expect(described_class.clean_query(query)).to eq 'monarch = "Crown of england"'
+      end
+
+      it 'remove quotes from null' do
+        query = 'monarch is not "null"'
+
+        expect(described_class.clean_query(query)).to eq 'monarch is not null'
       end
     end
 

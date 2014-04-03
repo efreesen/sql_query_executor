@@ -31,7 +31,8 @@ module SqlQueryExecutor
         end
 
         def self.remove_placeholders(query)
-          query.gsub(Base::QUERY_SPACE, ' ').gsub(Base::STRING_SPACE, ' ').gsub(Base::TEMP_SPACE, ' ')
+          new_query = query.gsub(Base::QUERY_SPACE, ' ').gsub(Base::STRING_SPACE, ' ').gsub(Base::TEMP_SPACE, ' ')
+          new_query.gsub('"null"', 'null').gsub("'null'", 'null')
         end
 
         def self.clean_query_attribute(query)
