@@ -51,6 +51,7 @@ module SqlQueryExecutor
         def self.interpolate_query(args)
           args.flatten!
           return args.first if args.size == 1 && args.first.is_a?(String)
+          return interpolate_hash(args) if args[1].is_a?(Hash)
 
           query = args.first
           param = args.delete_at(1)
@@ -60,6 +61,12 @@ module SqlQueryExecutor
           args[0] = query.sub("?", param.is_a?(Numeric) ? param : "#{param}")
 
           interpolate_query(args)
+        end
+
+        def self.interpolate_hash(args)
+          hash = args[1]
+
+          args.first.gsub(/:(\S+)/) { |match| convert_param(hash[match.gsub(":", '').to_sym]) }
         end
 
         # Removes all accents and other non default characters
