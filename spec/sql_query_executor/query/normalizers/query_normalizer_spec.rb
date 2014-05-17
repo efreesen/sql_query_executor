@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'ruby-prof'
 require 'sql_query_executor/query/normalizers/query_normalizer'
 
 describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
