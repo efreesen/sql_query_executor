@@ -30,6 +30,7 @@ module SqlQueryExecutor
       def convert_value(value)
         value.gsub!(/[\(\)\'\"]/, "")
         return value.to_i if is_a_number?(value)
+        return eval(value) if ['true', 'false'].include?(value)
 
         methods = {3 => "convert_date", 7 => "convert_time"}
 
