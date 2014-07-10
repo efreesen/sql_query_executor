@@ -10,7 +10,9 @@ describe SqlQueryExecutor::Query::Normalizers::OriginNormalizer do
 
         subject { described_class.execute(selector) }
 
-        its(:class) { should eq String }
+        it 'returns a string' do
+          expect(subject).to be_a String
+        end
 
         it 'converts correctly' do
           expect(subject).to eq(query)
