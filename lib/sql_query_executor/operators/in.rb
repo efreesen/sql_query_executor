@@ -3,8 +3,9 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class In < SqlQueryExecutor::Operators::Base
-      def execute!
-        result = @collection.select do |record|
+      def execute!(collection)
+        initialize_attributes
+        result = collection.select do |record|
           value = record.send(@field)
 
           @value.send('include?', value)
@@ -12,6 +13,7 @@ module SqlQueryExecutor
       end
 
       def selector
+        initialize_attributes
         { @field => { "$in" => @value }}
       end
 

@@ -16,24 +16,24 @@ describe SqlQueryExecutor::Operators::In do
     end
 
     context 'finds elements' do
-      subject { described_class.new("id in (2,4)", data) }
+      subject { described_class.new("id in (2,4)") }
 
       it 'returns filtered collection' do
-        expect(subject.execute!).to eq([OpenStruct.new({id: 2}), OpenStruct.new({id: 4})])
+        expect(subject.execute!(data)).to eq([OpenStruct.new({id: 2}), OpenStruct.new({id: 4})])
       end
     end
 
     context 'does not find elements' do
-      subject { described_class.new("id in (7,9)", data) }
+      subject { described_class.new("id in (7,9)") }
 
       it 'returns empty array' do
-        expect(subject.execute!).to eq([])
+        expect(subject.execute!(data)).to eq([])
       end
     end
   end
 
   describe "#selector" do
-    subject { described_class.new("id in (2,4)", []) }
+    subject { described_class.new("id in (2,4)") }
 
     it 'converts query' do
       expect(subject.selector).to eq({'id' => {'$in' => [2, 4]}})

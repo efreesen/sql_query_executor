@@ -6,22 +6,20 @@ module SqlQueryExecutor
       BINDING_OPERATORS = { "or" => "+", "and" => "&" }
       attr_reader :children, :kind, :binding_operator
       ADD_CHILDREN_METHODS = { sentence: :add_sentence_children, sub_query: :add_sub_query_children }
-      def initialize(query, collection)
-        @collection = collection
-        @query      = query
-        @children   = []
-        set_binding_operator
-        set_kind
-        set_children
+
+      def initialize(query)
+        @children = []
+        @query    = query
+        initialize_attributes
       end
 
-      def execute!(data=[])
+      def execute!(collection, data=[])
         return [] unless @children
 
         result = []
 
         @children.each do |child|
-          result = child.execute!(result)
+          result = child.execute!(collection, result)
         end
 
         result = (data || []).send(@binding_operator, result) if @binding_operator
@@ -49,6 +47,14 @@ module SqlQueryExecutor
       end
 
     private
+      def initialize_attributes
+        return if @kind
+
+        set_binding_operator
+        set_kind
+        set_children
+      end
+
       def set_binding_operator
         @binding_operator = nil
         operator = @query.split(Base::QUERY_SPACE).first
@@ -68,7 +74,7 @@ module SqlQueryExecutor
       end
 
       def add_sentence_children
-        @children << SqlQueryExecutor::Query::Sentence.new(@query.gsub(Base::QUERY_SPACE, " "), @collection)
+        @children << SqlQueryExecutor::Query::Sentence.new(@query.gsub(Base::QUERY_SPACE, " "))
       end
 
       def add_sub_query_children
@@ -86,7 +92,7 @@ module SqlQueryExecutor
 
           query = query.gsub("\$op1\$", "").gsub("\$cp1\$", "").gsub(/\$\Sp\d\$/, "")
 
-          @children << SqlQueryExecutor::Query::SubQuery.new(query, @collection)
+          @children << SqlQueryExecutor::Query::SubQuery.new(query)
         end
       end
 

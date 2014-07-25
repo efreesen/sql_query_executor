@@ -23,19 +23,18 @@ module SqlQueryExecutor
         "exists"  => SqlQueryExecutor::Operators::Default,#Exists
       }
 
-      def initialize(query, collection)
+      def initialize(query)
         @query    = query
-        @collection = collection
         @array = query.split(' ')
 
         set_operator
       end
 
       # The data parameter is only declared for SubQuery compatibility purposes
-      def execute!(data=[])
+      def execute!(collection, data=[])
         return [] unless @operator
 
-        @operator.execute!
+        @operator.execute!(collection)
       end
 
       def selector
@@ -46,7 +45,7 @@ module SqlQueryExecutor
       def set_operator
         operator = OPERATORS[@query.split(' ')[1]]
 
-        @operator = operator ? operator.new(@query, @collection) : nil
+        @operator = operator ? operator.new(@query) : nil
       end
     end
   end

@@ -12,6 +12,7 @@ module SqlQueryExecutor
           query = clean_query_attribute(query)
           method = CONVERT_METHODS[query.class.name]
 
+
           query = sanitize(send(method, query))
         end
 
@@ -21,7 +22,7 @@ module SqlQueryExecutor
 
         def self.attributes_from_query(query)
           return {} if query.empty?
-          selector = query.class == Hash ? query : Base.new([], query).selector
+          selector = query.class == Hash ? query : Base.new(query).selector
           super(selector)
         end
 

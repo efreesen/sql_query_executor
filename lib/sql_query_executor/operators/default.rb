@@ -12,13 +12,9 @@ module SqlQueryExecutor
         "!="      => "$ne"
       }
 
-      def initialize(query, collection)
-        super
-        convert_operator
-      end
-
-      def execute!
-        @collection.select do |record|
+      def execute!(collection)
+        initialize_attributes
+        collection.select do |record|
           value = record.send(@field.to_s)
 
           value = convert_value(value) rescue value
@@ -28,12 +24,19 @@ module SqlQueryExecutor
       end
 
       def selector
+        initialize_attributes
+
         operator = SELECTORS[@operator]
 
         { @field => operator ? {operator => @value} : @value}
       end
 
     private
+      def initialize_attributes
+        super
+        convert_operator
+      end
+
       def convert_operator
         @operator = @operator == "="  ? "==" : @operator
         @operator = @operator == "<>" ? "!=" : @operator

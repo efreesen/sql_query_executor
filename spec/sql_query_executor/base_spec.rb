@@ -70,30 +70,29 @@ describe SqlQueryExecutor::Base do
         end
       end
     end
+  end
 
-    context 'selector' do
-      let(:query)    { 'id > 3' }
-      let(:selector) { {'id' => {'$gt' => 3}} }
+  context 'selector' do
+    let(:query)    { 'id > 3' }
+    let(:selector) { {'id' => {'$gt' => 3}} }
 
-      it 'converts query' do
-        expect(described_class.new([], query).selector).to eq selector
-      end
+    it 'converts query' do
+      expect(described_class.new(query).selector).to eq selector
+    end
+  end
+
+  context 'to_sql' do
+    it 'converts selector' do
+      query = "name = 'Brazil'"
+      selector = {name: 'Brazil'}
+
+      expect(described_class.new(selector).to_sql).to eq query
     end
 
-    context 'to_sql' do
-      it 'converts selector' do
-        query = "name = 'Brazil'"
-        selector = {name: 'Brazil'}
+    it 'if is a string returns itself' do
+      wrong_query = "id is not 'null'"
 
-        expect(described_class.new([], selector).to_sql).to eq query
-      end
-
-      it 'removes quotes from null' do
-        wrong_query = "id is not 'null'"
-        right_query = 'id is not null'
-
-        expect(described_class.new([], wrong_query).to_sql).to eq right_query
-      end
+      expect(described_class.new(wrong_query).to_sql).to eq wrong_query
     end
   end
 end

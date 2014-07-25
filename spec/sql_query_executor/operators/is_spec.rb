@@ -19,15 +19,15 @@ describe SqlQueryExecutor::Operators::Is do
       context 'is' do
         context 'check null values' do
           it 'returns filtered collection' do
-            operator = described_class.new("id is null", data)
-            expect(operator.execute!).to eq([OpenStruct.new({id: nil})])
+            operator = described_class.new("id is null")
+            expect(operator.execute!(data)).to eq([OpenStruct.new({id: nil})])
           end
         end
 
         context 'check not null values' do
           it 'returns filtered collection' do
-            operator = described_class.new("id is 2", data)
-            expect(operator.execute!).to eq([OpenStruct.new({id: 2})])
+            operator = described_class.new("id is 2")
+            expect(operator.execute!(data)).to eq([OpenStruct.new({id: 2})])
           end
         end
       end
@@ -35,17 +35,17 @@ describe SqlQueryExecutor::Operators::Is do
       context 'is not' do
         context 'check null values' do
           it 'returns filtered collection' do
-            operator = described_class.new("id is not null", data)
+            operator = described_class.new("id is not null")
             
-            expect(operator.execute!).to eq(data - [OpenStruct.new({id: nil})])
+            expect(operator.execute!(data)).to eq(data - [OpenStruct.new({id: nil})])
           end
         end
 
         context 'check not null values' do
           it 'returns filtered collection' do
-            operator = described_class.new("id is not 2", data)
+            operator = described_class.new("id is not 2")
             
-            expect(operator.execute!).to eq(data - [OpenStruct.new({id: 2})])
+            expect(operator.execute!(data)).to eq(data - [OpenStruct.new({id: 2})])
           end
         end
       end
@@ -65,15 +65,15 @@ describe SqlQueryExecutor::Operators::Is do
 
         context 'check null values' do
           it 'returns empty array' do
-            operator = described_class.new("id is null", data)
-            expect(operator.execute!).to eq([])
+            operator = described_class.new("id is null")
+            expect(operator.execute!(data)).to eq([])
           end
         end
 
         context 'check not null values' do
           it 'returns empty array' do
-            operator = described_class.new("id is 8", data)
-            expect(operator.execute!).to eq([])
+            operator = described_class.new("id is 8")
+            expect(operator.execute!(data)).to eq([])
           end
         end
       end
@@ -91,9 +91,9 @@ describe SqlQueryExecutor::Operators::Is do
           end
 
           it 'returns filtered collection' do
-            operator = described_class.new("id is not null", data)
+            operator = described_class.new("id is not null")
             
-            expect(operator.execute!).to eq([])
+            expect(operator.execute!(data)).to eq([])
           end
         end
 
@@ -109,9 +109,9 @@ describe SqlQueryExecutor::Operators::Is do
           end
 
           it 'returns filtered collection' do
-            operator = described_class.new("id is not 2", data)
+            operator = described_class.new("id is not 2")
             
-            expect(operator.execute!).to eq([])
+            expect(operator.execute!(data)).to eq([])
           end
         end
       end
@@ -121,7 +121,7 @@ describe SqlQueryExecutor::Operators::Is do
   describe "#selector" do
     context 'is' do
       context 'check null values' do
-        subject { described_class.new("id is null", []) }
+        subject { described_class.new("id is null") }
 
         it 'converts query' do
           expect(subject.selector).to eq({'id' => nil})
@@ -129,7 +129,7 @@ describe SqlQueryExecutor::Operators::Is do
       end
 
       context 'check not null values' do
-        subject { described_class.new("id is 2", []) }
+        subject { described_class.new("id is 2") }
 
         it 'converts query' do
           expect(subject.selector).to eq({'id' => 2})
@@ -139,7 +139,7 @@ describe SqlQueryExecutor::Operators::Is do
 
     context 'is not' do
       context 'check null values' do
-        subject { described_class.new("id is not null", []) }
+        subject { described_class.new("id is not null") }
 
         it 'converts query' do
           expect(subject.selector).to eq({"id"=>{"$ne"=>nil}})
@@ -147,7 +147,7 @@ describe SqlQueryExecutor::Operators::Is do
       end
 
       context 'check not null values' do
-        subject { described_class.new("id is not 2", []) }
+        subject { described_class.new("id is not 2") }
 
         it 'converts query' do
           expect(subject.selector).to eq({"id"=>{"$ne"=>2}})

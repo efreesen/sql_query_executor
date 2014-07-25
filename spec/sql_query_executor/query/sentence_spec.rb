@@ -13,13 +13,13 @@ describe SqlQueryExecutor::Query::Sentence do
   context "when single query" do
     context "and Default Operator" do
       let(:query) { "name = \"US\"" }
-      subject { described_class.new(query, data) }
+      subject { described_class.new(query) }
 
       its(:query) { should == query }
 
       context 'execute!' do
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq [data.first]
+          expect(subject.execute!(data)).to eq [data.first]
         end
       end
 
@@ -32,13 +32,13 @@ describe SqlQueryExecutor::Query::Sentence do
 
     context "and Between Operator" do
       let(:query) { "created_at between '2013-12-31' and '2014-01-12'" }
-      subject { described_class.new(query, data) }
+      subject { described_class.new(query) }
 
       its(:query) { should == query }
 
       context 'execute!' do
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq [data.first, data[2]]
+          expect(subject.execute!(data)).to eq [data.first, data[2]]
         end
       end
 
@@ -51,13 +51,13 @@ describe SqlQueryExecutor::Query::Sentence do
 
     context "and Is Operator" do
       let(:query) { "language is null" }
-      subject { described_class.new(query, data) }
+      subject { described_class.new(query) }
 
       its(:query) { should == query }
 
       context 'execute1' do
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq [data.last]
+          expect(subject.execute!(data)).to eq [data.last]
         end
       end
 
@@ -70,13 +70,13 @@ describe SqlQueryExecutor::Query::Sentence do
 
     context "and In Operator" do
       let(:query) { "language in ('English','Spanish')" }
-      subject { described_class.new(query, data) }
+      subject { described_class.new(query) }
 
       its(:query) { should == query }
 
       context 'execute!' do
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq [data.first, data[3]]
+          expect(subject.execute!(data)).to eq [data.first, data[3]]
         end
       end
 

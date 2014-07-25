@@ -3,8 +3,9 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class Between < SqlQueryExecutor::Operators::Base
-      def execute!
-        @collection.select do |record|
+      def execute!(collection)
+        initialize_attributes
+        collection.select do |record|
           value = convert_value(record.send(@field).to_s)
 
           if value.class != @value.first.class
@@ -19,6 +20,7 @@ module SqlQueryExecutor
       end
 
       def selector
+        initialize_attributes
         { @field => { "$gte" => @value.first, "$lte" => @value.last }}
       end
 

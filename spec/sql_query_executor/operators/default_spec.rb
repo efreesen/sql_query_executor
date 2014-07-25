@@ -17,100 +17,100 @@ describe SqlQueryExecutor::Operators::Default do
 
     context '=' do
       context 'finds element' do
-        subject { described_class.new("id = 2", data) }
+        subject { described_class.new("id = 2") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq([OpenStruct.new({id: 2})])
+          expect(subject.execute!(data)).to eq([OpenStruct.new({id: 2})])
         end
       end
 
       context 'does not find element' do
-        subject { described_class.new("id = 9", data) }
+        subject { described_class.new("id = 9") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '>' do
       context 'finds element' do
-        subject { described_class.new("id > 4", data) }
+        subject { described_class.new("id > 4") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq([OpenStruct.new({id: 5})])
+          expect(subject.execute!(data)).to eq([OpenStruct.new({id: 5})])
         end
       end
 
       context 'does not find element' do
-        subject { described_class.new("id > 9", data) }
+        subject { described_class.new("id > 9") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '<' do
       context 'finds element' do
-        subject { described_class.new("id < 2", data) }
+        subject { described_class.new("id < 2") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq([OpenStruct.new({id: 1})])
+          expect(subject.execute!(data)).to eq([OpenStruct.new({id: 1})])
         end
       end
 
       context 'does not find element' do
-        subject { described_class.new("id < 1", data) }
+        subject { described_class.new("id < 1") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '>=' do
       context 'finds element' do
-        subject { described_class.new("id >= 5", data) }
+        subject { described_class.new("id >= 5") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq([OpenStruct.new({id: 5})])
+          expect(subject.execute!(data)).to eq([OpenStruct.new({id: 5})])
         end
       end
 
       context 'does not find element' do
-        subject { described_class.new("id >= 6", data) }
+        subject { described_class.new("id >= 6") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '<=' do
       context 'finds element' do
-        subject { described_class.new("id <= 1", data) }
+        subject { described_class.new("id <= 1") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq([OpenStruct.new({id: 1})])
+          expect(subject.execute!(data)).to eq([OpenStruct.new({id: 1})])
         end
       end
 
       context 'does not find element' do
-        subject { described_class.new("id <= 0", data) }
+        subject { described_class.new("id <= 0") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '!=' do
       context 'finds element' do
-        subject { described_class.new("id != 1", data) }
+        subject { described_class.new("id != 1") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq(data - [OpenStruct.new({id: 1})])
+          expect(subject.execute!(data)).to eq(data - [OpenStruct.new({id: 1})])
         end
       end
 
@@ -126,20 +126,20 @@ describe SqlQueryExecutor::Operators::Default do
           ]
         end
 
-        subject { described_class.new("id != 1", data) }
+        subject { described_class.new("id != 1") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
 
     context '<>' do
       context 'finds element' do
-        subject { described_class.new("id <> 1", data) }
+        subject { described_class.new("id <> 1") }
 
         it 'returns filtered collection' do
-          expect(subject.execute!).to eq(data - [OpenStruct.new({id: 1})])
+          expect(subject.execute!(data)).to eq(data - [OpenStruct.new({id: 1})])
         end
       end
 
@@ -155,10 +155,10 @@ describe SqlQueryExecutor::Operators::Default do
           ]
         end
 
-        subject { described_class.new("id <> 1", data) }
+        subject { described_class.new("id <> 1") }
 
         it 'returns empty array' do
-          expect(subject.execute!).to eq([])
+          expect(subject.execute!(data)).to eq([])
         end
       end
     end
@@ -166,7 +166,7 @@ describe SqlQueryExecutor::Operators::Default do
 
   describe "#selector" do
     context '=' do
-      subject { described_class.new("id = 2", []) }
+      subject { described_class.new("id = 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => 2})
@@ -174,7 +174,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '>' do
-      subject { described_class.new("id > 2", []) }
+      subject { described_class.new("id > 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$gt' => 2}})
@@ -182,7 +182,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '<' do
-      subject { described_class.new("id < 2", []) }
+      subject { described_class.new("id < 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$lt' => 2}})
@@ -190,7 +190,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '>=' do
-      subject { described_class.new("id >= 2", []) }
+      subject { described_class.new("id >= 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$gte' => 2}})
@@ -198,7 +198,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '<=' do
-      subject { described_class.new("id <= 2", []) }
+      subject { described_class.new("id <= 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$lte' => 2}})
@@ -206,7 +206,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '!=' do
-      subject { described_class.new("id != 2", []) }
+      subject { described_class.new("id != 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$ne' => 2}})
@@ -214,7 +214,7 @@ describe SqlQueryExecutor::Operators::Default do
     end
 
     context '<>' do
-      subject { described_class.new("id <> 2", []) }
+      subject { described_class.new("id <> 2") }
 
       it 'converts query' do
         expect(subject.selector).to eq({'id' => {'$ne' => 2}})

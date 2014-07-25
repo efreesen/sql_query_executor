@@ -3,20 +3,26 @@ require 'sql_query_executor/base'
 module SqlQueryExecutor
   module Operators
     class Base
-      def initialize(query, collection)
-        @query      = SqlQueryExecutor::Query::Normalizers::QueryNormalizer.execute(query).gsub(SqlQueryExecutor::Base::QUERY_SPACE, ' ')
-        @collection = collection
+      def initialize(query)
+        @query = query
+      end
+
+      def selector
+        initialize_attributes
+        { @field => @value }
+      end
+
+    protected
+      def initialize_attributes
+        return if @array
+
+        @query      = SqlQueryExecutor::Query::Normalizers::QueryNormalizer.execute(@query).gsub(SqlQueryExecutor::Base::QUERY_SPACE, ' ')
         @array      = @query.split(' ')
         @operator   = @query.split(' ')[1]
         @field      = get_field
         @value      = get_value
       end
 
-      def selector
-        { @field => @value }
-      end
-
-    protected
       def get_field
         @array.first
       end
