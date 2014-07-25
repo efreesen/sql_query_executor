@@ -15,7 +15,11 @@ describe SqlQueryExecutor::Query::Sentence do
       let(:query) { "name = \"US\"" }
       subject { described_class.new(query) }
 
-      its(:query) { should == query }
+      context 'query' do
+        it 'returns the query' do
+          expect(subject.query).to eq query
+        end
+      end
 
       context 'execute!' do
         it 'returns filtered collection' do
@@ -34,7 +38,11 @@ describe SqlQueryExecutor::Query::Sentence do
       let(:query) { "created_at between '2013-12-31' and '2014-01-12'" }
       subject { described_class.new(query) }
 
-      its(:query) { should == query }
+      context 'query' do
+        it 'returns the query' do
+          expect(subject.query).to eq query
+        end
+      end
 
       context 'execute!' do
         it 'returns filtered collection' do
@@ -53,7 +61,11 @@ describe SqlQueryExecutor::Query::Sentence do
       let(:query) { "language is null" }
       subject { described_class.new(query) }
 
-      its(:query) { should == query }
+      context 'query' do
+        it 'returns the query' do
+          expect(subject.query).to eq query
+        end
+      end
 
       context 'execute1' do
         it 'returns filtered collection' do
@@ -72,7 +84,11 @@ describe SqlQueryExecutor::Query::Sentence do
       let(:query) { "language in ('English','Spanish')" }
       subject { described_class.new(query) }
 
-      its(:query) { should == query }
+      context 'query' do
+        it 'returns the query' do
+          expect(subject.query).to eq query
+        end
+      end
 
       context 'execute!' do
         it 'returns filtered collection' do

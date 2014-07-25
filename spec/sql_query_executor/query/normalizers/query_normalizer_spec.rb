@@ -18,7 +18,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.execute(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("monarch$QS$=$QS$'Crown$SS$of$SS$england'")
@@ -30,7 +32,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.execute(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("monarch$QS$=$QS$'Crown$SS$of$SS$england'")
@@ -101,7 +105,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.clean_query(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("monarch = 'Crown of england'")
@@ -113,7 +119,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.clean_query(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("monarch = 'Crown of england'")
@@ -125,7 +133,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.clean_query(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("(monarch = 'Crown of england' and name = 'Canada')")
@@ -137,7 +147,9 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
 
       subject { described_class.clean_query(query) }
 
-      its(:class) { should eq String }
+      it 'returns a String' do
+        expect(subject).to be_a(String)
+      end
 
       it 'converts correctly' do
         expect(subject).to eq("(monarch = 'Crown of england' and name = 'Canada' and (monarch is null or name = 'Brazil'))")
