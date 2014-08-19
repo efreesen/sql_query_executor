@@ -6,4 +6,3 @@ Coveralls.wear!
 # end
 
 require 'rspec'
-require 'rspec/autorun'

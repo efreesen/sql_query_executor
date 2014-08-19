@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-require 'stackprof'
 require 'sql_query_executor'
 require 'sql_query_executor/base'
 
