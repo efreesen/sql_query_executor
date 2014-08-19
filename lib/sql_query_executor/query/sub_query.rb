@@ -1,4 +1,5 @@
 require 'sql_query_executor/query/sentence'
+require 'pry'
 
 module SqlQueryExecutor
   module Query
@@ -14,17 +15,19 @@ module SqlQueryExecutor
       end
 
       def execute!(collection, data=[])
-        return [] unless @children
+        is_hash = collection.first.is_a?(Hash)
+        method_eval = logic(is_hash)
+        klass = collection.first.class
 
-        result = []
-
-        @children.each do |child|
-          result = child.execute!(collection, result)
+        klass.instance_eval do
+          eval("define_method(:this_method_will_be_removed_in_a_little_while) { #{method_eval} }")
         end
 
-        result = (data || []).send(@binding_operator, result) if @binding_operator
+        result = collection.select{ |object| object.this_method_will_be_removed_in_a_little_while }
 
-        result.sort_by(&:id)
+        klass.class_eval { undef :this_method_will_be_removed_in_a_little_while }
+
+        is_hash ? result.sort_by{ |hash| hash[:id] } : result.sort_by(&:id)
       end
 
       def selector
@@ -44,6 +47,21 @@ module SqlQueryExecutor
 
       def to_sql
         SqlQueryExecutor::Query::Normalizers::QueryNormalizer.clean_query(@query)
+      end
+
+      def logic(is_hash=false)
+        string = ''
+
+        @children.each do |child|
+          if child.respond_to?(:binding_operator) && child.binding_operator
+            operator = BINDING_OPERATORS.invert[child.binding_operator]
+            string = "(#{string} #{operator} #{child.logic(is_hash)})"
+          else
+            string += child.logic(is_hash)
+          end
+        end
+
+        string
       end
 
     private

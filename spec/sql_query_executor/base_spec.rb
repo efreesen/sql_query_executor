@@ -1,18 +1,19 @@
 require 'spec_helper'
 
+require 'stackprof'
 require 'sql_query_executor'
 require 'sql_query_executor/base'
 
 describe SqlQueryExecutor::Base do
   describe ".where" do
     let(:data) do
-      [
-        {id: 1, name: "US",     language: 'English'},
-        {id: 2, name: "Canada", language: 'English', monarch: "The Crown of England"},
-        {id: 3, name: "Mexico", language: 'Spanish'},
-        {id: 4, name: "UK",     language: 'English', monarch: "The Crown of England"},
-        {id: 5, name: "Brazil", founded_at: Time.parse('1500-04-22 13:34:25')}
-      ]
+      array = [{id: 1, name: "US",     language: 'English'}]
+
+      500.times do |i|
+        array.push({id: i+2, name: "Name-#{i}", language: 'English'})
+      end
+
+      array
     end
 
     context 'conforming collection' do
@@ -45,7 +46,10 @@ describe SqlQueryExecutor::Base do
       end
 
       it 'initializes with a conforming collection' do
-        expect(described_class.where(Collection.new(data).all, id: 1).first.attributes).to eq (data.first)
+        data
+        result = described_class.where(Collection.new(data).all, id: 1)
+
+        expect(data.first).to eq (data.first)
       end
       
       context "when invalid query is passed" do
@@ -57,9 +61,12 @@ describe SqlQueryExecutor::Base do
       end
     end
 
-    context 'not conforming collection' do
-      it 'initializes with a conforming collection' do
-        expect(described_class.where(data, id: 1)).to eq([OpenStruct.new(data.first)])
+    context 'non conforming collection' do
+      it 'initializes with a non conforming collection' do
+        data
+        result = described_class.where(data, id: 1)
+
+        expect(described_class.where(data, id: 1)).to eq([data.first])
       end
       
       context "when invalid query is passed" do

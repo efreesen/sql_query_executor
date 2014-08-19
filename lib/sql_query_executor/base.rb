@@ -62,11 +62,9 @@ module SqlQueryExecutor #:nodoc:
     end
 
     def set_collection(collection)
-      if collection.any? && collection.first.is_a?(Hash)
-        convert_collection(collection)
-      else
-        @collection = conforming_collection?(collection) ? collection : []
-      end
+      return if @collection
+
+      @collection = collection
     end
 
     def convert_collection(collection=[])

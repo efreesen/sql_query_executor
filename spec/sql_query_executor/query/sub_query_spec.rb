@@ -28,6 +28,20 @@ describe SqlQueryExecutor::Query::SubQuery do
         end
       end
 
+      context 'logic' do
+        context 'and is not a Hash' do
+          it 'returns logic' do
+            expect(subject.logic).to eq("name == 'US'")
+          end
+        end
+
+        context 'and is a Hash' do
+          it 'returns logic' do
+            expect(subject.logic(true)).to eq("self[:name] == 'US'")
+          end
+        end
+      end
+
       context 'execute!' do
         it 'returns filtered collection' do
           expect(subject.execute!(data)).to eq([data.first])
@@ -52,6 +66,20 @@ describe SqlQueryExecutor::Query::SubQuery do
         end
       end
 
+      context 'logic' do
+        context 'and is not a Hash' do
+          it 'returns logic' do
+            expect(subject.logic).to eq("((name == 'US' and id == 1) and language == 'English')")
+          end
+        end
+
+        context 'and is a Hash' do
+          it 'returns logic' do
+            expect(subject.logic(true)).to eq("((self[:name] == 'US' and self[:id] == 1) and self[:language] == 'English')")
+          end
+        end
+      end
+
       context 'execute!' do
         it 'returns filtered collection' do
           expect(subject.execute!(data)).to eq([data.first])
@@ -73,6 +101,20 @@ describe SqlQueryExecutor::Query::SubQuery do
       context 'selector' do
         it 'returns selector' do
           expect(subject.selector).to eq({'$and'=>[{'$or'=>[{'$and'=>[{"name"=>"US"}, {"id"=>1}]}, {"name"=>"Brazil"}]}, {"created_at"=>{'$gt' => Date.new(2014,01,04)}}]})
+        end
+      end
+
+      context 'logic' do
+        context 'and is not a Hash' do
+          it 'returns logic' do
+            expect(subject.logic).to eq("(((name == 'US' and id == 1) or name == 'Brazil') and created_at > Date.new(2014, 1, 4))")
+          end
+        end
+
+        context 'and is a Hash' do
+          it 'returns logic' do
+            expect(subject.logic(true)).to eq("(((self[:name] == 'US' and self[:id] == 1) or self[:name] == 'Brazil') and self[:created_at] > Date.new(2014, 1, 4))")
+          end
         end
       end
 

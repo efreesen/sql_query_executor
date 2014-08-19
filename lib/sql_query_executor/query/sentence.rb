@@ -30,15 +30,12 @@ module SqlQueryExecutor
         set_operator
       end
 
-      # The data parameter is only declared for SubQuery compatibility purposes
-      def execute!(collection, data=[])
-        return [] unless @operator
-
-        @operator.execute!(collection)
-      end
-
       def selector
         @operator.selector
+      end
+
+      def logic(is_hash=false)
+        @operator.logic(is_hash)
       end
 
     private

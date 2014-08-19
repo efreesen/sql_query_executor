@@ -3,33 +3,23 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class Between < SqlQueryExecutor::Operators::Base
-      def execute!(collection)
-        initialize_attributes
-        collection.select do |record|
-          value = convert_value(record.send(@field).to_s)
-
-          if value.class != @value.first.class
-            false
-          else
-            greather_than = value.send('>=', @value.first)
-            smaller_than  = value.send('<=', @value.last)
-
-            greather_than && smaller_than
-          end
-        end
-      end
-
       def selector
         initialize_attributes
         { @field => { "$gte" => @value.first, "$lte" => @value.last }}
       end
 
+      def logic(is_hash=false)
+        initialize_attributes(true)
+
+        "#{field(is_hash)} >= #{@value[0]} && #{field(is_hash)} <= #{@value[1]}"
+      end
+
     private
-      def get_value
+      def get_value(logic=false)
         value = []
 
-        value << convert_value(@array[2].gsub(SqlQueryExecutor::Base::STRING_SPACE, ' '))
-        value << convert_value(@array[4].gsub(SqlQueryExecutor::Base::STRING_SPACE, ' '))
+        value << convert_value(@array[2].gsub(SqlQueryExecutor::Base::STRING_SPACE, ' '), logic)
+        value << convert_value(@array[4].gsub(SqlQueryExecutor::Base::STRING_SPACE, ' '), logic)
       end
     end
   end

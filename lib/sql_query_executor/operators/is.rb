@@ -3,16 +3,6 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class Is < SqlQueryExecutor::Operators::Base
-      def execute!(collection)
-        initialize_attributes
-
-        collection.select do |record|
-          value = record.send(@field)
-
-          value.send(@operator, @value)
-        end
-      end
-
       def selector
         initialize_attributes
 
@@ -20,12 +10,13 @@ module SqlQueryExecutor
       end
 
     private
-      def initialize_attributes
+      def initialize_attributes(logic=false)
         super
         convert_operator
       end
-      def get_value
-        @array.include?('null') ? nil : convert_value(@array.last)
+
+      def get_value(logic=false)
+        @array.include?('null') ? nil : convert_value(@array.last, logic)
       end
 
       def convert_operator

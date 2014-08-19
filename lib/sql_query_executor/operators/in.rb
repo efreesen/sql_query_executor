@@ -3,25 +3,22 @@ require 'sql_query_executor/operators/base'
 module SqlQueryExecutor
   module Operators
     class In < SqlQueryExecutor::Operators::Base
-      def execute!(collection)
-        initialize_attributes
-        result = collection.select do |record|
-          value = record.send(@field)
-
-          @value.send('include?', value)
-        end
-      end
-
       def selector
         initialize_attributes
         { @field => { "$in" => @value }}
       end
 
+      def logic(is_hash=false)
+        initialize_attributes(true)
+
+        "[#{@value.join(', ')}].include?(#{field(is_hash)})"
+      end
+
     private
-      def get_value
+      def get_value(logic=false)
         value = super
 
-        value.gsub(SqlQueryExecutor::Base::STRING_SPACE, '').split(',').map{ |v| convert_value(v) }
+        value.gsub(SqlQueryExecutor::Base::STRING_SPACE, '').split(',').map{ |v| convert_value(v, logic) }
       end
     end
   end
