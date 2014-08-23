@@ -14,16 +14,32 @@ describe SqlQueryExecutor::Query::Normalizers::QueryNormalizer do
     end
 
     context 'query is an Array' do
-      let!(:query) { ['monarch = ?', "Crown of england"] }
+      context 'when all elements are strings' do
+        let!(:query) { ['monarch = ?', "Crown of england"] }
 
-      subject { described_class.execute(query) }
+        subject { described_class.execute(query) }
 
-      it 'returns a String' do
-        expect(subject).to be_a(String)
+        it 'returns a String' do
+          expect(subject).to be_a(String)
+        end
+
+        it 'converts correctly' do
+          expect(subject).to eq("monarch$QS$=$QS$'Crown$SS$of$SS$england'")
+        end
       end
 
-      it 'converts correctly' do
-        expect(subject).to eq("monarch$QS$=$QS$'Crown$SS$of$SS$england'")
+      context 'when second element is a Hash' do
+        let!(:query) { ['monarch = :name', name: "Crown of england"] }
+
+        subject { described_class.execute(query) }
+
+        it 'returns a String' do
+          expect(subject).to be_a(String)
+        end
+
+        it 'converts correctly' do
+          expect(subject).to eq("monarch$QS$=$QS$'Crown$SS$of$SS$england'")
+        end
       end
     end
 

@@ -68,19 +68,6 @@ module SqlQueryExecutor #:nodoc:
       @collection = collection
     end
 
-    def convert_collection(collection=[])
-      @collection = []
-      collection.each do |object|
-        attributes = object.is_a?(Hash) ? object : object.attributes
-        register = OpenStruct.new(attributes)
-        @collection << register
-      end
-    end
-
-    def conforming_collection?(collection)
-      collection.first.respond_to?(:attributes)
-    end
-
     def check_query
       return if @query.empty?
 
