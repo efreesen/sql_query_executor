@@ -25,8 +25,8 @@ Gem::Specification.new do |gem|
     "spec/sql_query_executor/base_spec.rb"
   ]
 
-  gem.add_development_dependency(%q<rspec>, [">= 2.2.0"])
-  gem.add_development_dependency('rake', [">= 10.0.0"])
-  gem.add_development_dependency('coveralls')
-  gem.add_development_dependency('pry')
+  gem.add_development_dependency(%q<rspec>, ["~> 2.2", ">= 2.2.0"])
+  gem.add_development_dependency('rake', ["~> 10.0", ">= 10.0.0"])
+  gem.add_development_dependency('coveralls', ["~> 0.7", ">= 0.7.0"])
+  gem.add_development_dependency('pry', ["~> 0.9", ">= 0.9.12"])
 end

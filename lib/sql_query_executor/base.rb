@@ -21,6 +21,7 @@ module SqlQueryExecutor #:nodoc:
     end
 
     def execute!(collection)
+      return [] if @query.empty?
       set_collection(collection)
 
       convert_query.execute!(@collection)
@@ -81,6 +82,8 @@ module SqlQueryExecutor #:nodoc:
     end
 
     def check_query
+      return if @query.empty?
+
       if @query.is_a?(Array) && !@query.first.is_a?(String)
         "First element from array must be a String. eg: [\"name = ?\", \"John\"]"
       end

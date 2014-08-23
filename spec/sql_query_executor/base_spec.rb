@@ -15,6 +15,14 @@ describe SqlQueryExecutor::Base do
       array
     end
 
+    context 'when initialized with an empty string' do
+      subject { described_class.where('') }
+
+      it '' do
+        expect(subject).to be_empty
+      end
+    end
+
     context 'conforming collection' do
       before do
         class Model
