@@ -35,6 +35,14 @@ describe SqlQueryExecutor::Operators::Base do
       end
     end
 
+    context 'number as string parameter' do
+      subject { described_class.new("id = '1'") }
+
+      it 'forms an invalid query' do
+        expect(subject.selector).to eq({"id"=>1})
+      end
+    end
+
     context 'date parameter' do
       context 'when a valid date is passed' do
         subject { described_class.new("date = '2014-01-01'") }
@@ -105,6 +113,14 @@ describe SqlQueryExecutor::Operators::Base do
           expect(subject.logic).to eq("id == 1")
         end
       end
+
+    context 'number as string parameter' do
+      subject { described_class.new("id = '1'") }
+
+      it 'forms an invalid query' do
+        expect(subject.logic).to eq("id == (id.is_a?(Fixnum) ? '1'.to_i : '1')")
+      end
+    end
 
       context 'date parameter' do
         context 'when a valid date is passed' do

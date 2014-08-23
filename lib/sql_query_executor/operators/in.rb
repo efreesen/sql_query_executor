@@ -16,9 +16,14 @@ module SqlQueryExecutor
 
     private
       def get_value(logic=false)
-        value = super
+        values = []
+        value = @array.last.gsub(SqlQueryExecutor::Base::STRING_SPACE, ' ')
 
-        value.gsub(SqlQueryExecutor::Base::STRING_SPACE, '').split(',').map{ |v| convert_value(v, logic) }
+        value.split(',').each do |val|
+          values.push(convert_value(val, logic))
+        end
+
+        values
       end
     end
   end

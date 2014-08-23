@@ -15,7 +15,14 @@ module SqlQueryExecutor
       def logic(is_hash=false)
         initialize_attributes(true)
 
-        "#{field(is_hash)} #{@operator} #{@value || 'nil'}"
+        field = field(is_hash)
+        value = @value || 'nil'
+
+        if value.is_a?(String) && is_a_number?(value.gsub(/[\"|\']/, ''))
+          "#{field} #{@operator} (#{field}.is_a?(Fixnum) ? #{value}.to_i : #{value})"
+        else
+          "#{field} #{@operator} #{value}"
+        end
       end
 
     protected
@@ -44,22 +51,26 @@ module SqlQueryExecutor
       end
 
       def convert_value(value, logic=false)
+        real_value = value.dup
         value.gsub!(/[\(\)\'\"]/, "")
-        return value.to_i if is_a_number?(value)
-        return value.to_f if is_a_number?(value, true)
-        return eval(value) if ['true', 'false'].include?(value)
 
         methods = {3 => "convert_date", 7 => "convert_time"}
 
         array = split(value)
 
         if methods.keys.include?(array.size)
-          value = (send(methods[array.size], array, logic) || (logic ? "'#{value}'" : value))
-        elsif logic
-          value = "'#{value}'" if value.is_a?(String)
+          date_value = send(methods[array.size], array, logic)
+
+          return date_value if date_value
         end
 
-        value
+        unless logic && ["'", '"'].include?(real_value[0])
+          return value.to_i if is_a_number?(value)
+          return value.to_f if is_a_number?(value, true)
+          return eval(value) if ['true', 'false'].include?(value)
+        end
+
+        logic ? "'#{value}'" : value 
       end
 
     private
