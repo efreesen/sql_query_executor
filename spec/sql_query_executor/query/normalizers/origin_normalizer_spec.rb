@@ -19,6 +19,17 @@ describe SqlQueryExecutor::Query::Normalizers::OriginNormalizer do
         end
       end
 
+      context 'when value is an empty string' do
+        let(:selector) { {id: ""} }
+        let(:query) { "id = ''" }
+
+        subject { described_class.execute(selector) }
+
+        it 'converts correctly' do
+          expect(subject).to eq(query)
+        end
+      end
+
       context 'when value is an integer' do
         let(:selector) { {id: 1} }
         let(:query) { "id = 1" }
