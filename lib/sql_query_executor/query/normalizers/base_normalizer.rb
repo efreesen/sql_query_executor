@@ -11,6 +11,8 @@ module SqlQueryExecutor
           when "NilClass"
             nil
           when "String"
+            # Exit early if we have an empty string, otherwise a single ' will be returned
+            return "''" if(param == "")
             "'#{param}'".gsub("''", "'").gsub('""', '"')
           when "Date"
             "'#{param.strftime("%Y-%m-%d")}'"
